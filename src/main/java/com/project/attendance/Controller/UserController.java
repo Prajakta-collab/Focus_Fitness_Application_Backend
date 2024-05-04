@@ -5,6 +5,7 @@ import com.project.attendance.Payload.UserDTO;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class UserController {
 
 
     @GetMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUser(){
         List<UserDTO> allUsers = userService.getAllUser() ;
         return ResponseEntity.ok(allUsers) ;
@@ -37,18 +39,21 @@ public class UserController {
     }
 
     @DeleteMapping("{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Integer userId){
         userService.deleteUser(userId); ;
         return ResponseEntity.ok("Deleted Successfully") ;
     }
 
     @GetMapping("/shift")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUserByShift(@RequestParam String shift){
         List<UserDTO> userDTOS = userService.getAllUserByShift(shift) ;
         return ResponseEntity.ok(userDTOS) ;
     }
 
     @PostMapping("/enroll/user/{userId}/batch/{batchId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserDTO> enrollToBatch(@PathVariable Integer userId ,
                                                  @PathVariable Integer batchId){
 

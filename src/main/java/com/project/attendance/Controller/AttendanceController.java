@@ -5,6 +5,7 @@ import com.project.attendance.Payload.UserDTO;
 import com.project.attendance.ServiceImpl.AttendanceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/batch")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllPresentUserByBatch(@RequestParam Integer batchId ,
                                                                   @RequestParam String date){
         List<UserDTO> users = attendanceService.getAllPresentUserByBatch(batchId , date) ;

@@ -15,9 +15,6 @@ import org.hibernate.validator.constraints.UniqueElements;
 public class Role {
 
     @Id
-    @UniqueElements
     private Integer id ;
-
     private String roleName ;
-
 }
