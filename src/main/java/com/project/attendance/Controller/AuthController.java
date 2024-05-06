@@ -33,7 +33,7 @@ public class AuthController {
     UserServiceImpl userService ;
 
     @PostMapping("/signup")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){
         UserDTO createdUser = userService.createUser(userDTO) ;
         return ResponseEntity.ok(createdUser) ;

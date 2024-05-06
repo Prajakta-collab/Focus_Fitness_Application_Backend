@@ -23,12 +23,7 @@ public class Batch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id ;
-
     private String batchName ;
-    private LocalDate timing ;
-
-    @ManyToOne
-    private Staff staff ;
 
     @OneToMany
     List<User> users ;
@@ -37,11 +32,9 @@ public class Batch {
 
     }
 
-    public Batch(Integer id, String batchName, LocalDate timing, Staff staff, List<User> users) {
+    public Batch(Integer id, String batchName, LocalDate timing, List<User> users) {
         this.id = id;
         this.batchName = batchName;
-        this.timing = timing;
-        this.staff = staff;
         this.users = users;
     }
 
@@ -51,22 +44,6 @@ public class Batch {
 
     public void setBatchName(String batchName) {
         this.batchName = batchName;
-    }
-
-    public LocalDate getTiming() {
-        return timing;
-    }
-
-    public void setTiming(LocalDate timing) {
-        this.timing = timing;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
     }
 
     public List<User> getUsers() {

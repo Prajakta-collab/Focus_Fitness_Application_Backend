@@ -1,5 +1,6 @@
 package com.project.attendance.Model;
 
+import com.project.attendance.Payload.UserDTO;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +37,8 @@ public class User implements UserDetails {
     @ManyToOne
     private Batch enrolledBatch ;
 
+//    @ManyToMany
+//    private List<User> ptUsers = new ArrayList<>() ;
 
     public List<Role> getRoles() {
         return roles;

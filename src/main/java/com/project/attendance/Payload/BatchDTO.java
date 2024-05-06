@@ -1,7 +1,5 @@
 package com.project.attendance.Payload;
 
-import com.project.attendance.Model.Staff;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,18 +12,16 @@ public class BatchDTO {
         this.id = id;
     }
 
-    public BatchDTO(Integer id, String batchName, LocalDate timing, StaffDTO staff, List<UserDTO> users) {
+    public BatchDTO(Integer id, String batchName, LocalDate timing, List<UserDTO> users) {
         this.id = id;
         this.batchName = batchName;
         this.timing = timing;
-        this.staff = staff;
         this.users = users;
     }
 
     private Integer id ;
     private String batchName ;
     private LocalDate timing ;
-    private StaffDTO staff ;
 
 
     List<UserDTO> users ;
@@ -33,8 +29,6 @@ public class BatchDTO {
     public BatchDTO(){
 
     }
-
-
 
     public String getBatchName() {
         return batchName;
@@ -50,14 +44,6 @@ public class BatchDTO {
 
     public void setTiming(LocalDate timing) {
         this.timing = timing;
-    }
-
-    public StaffDTO getStaff() {
-        return staff;
-    }
-
-    public void setStaff(StaffDTO staff) {
-        this.staff = staff;
     }
 
     public List<UserDTO> getUsers() {

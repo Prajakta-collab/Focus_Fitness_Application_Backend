@@ -42,16 +42,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserDTO userDTO) {
         User user = modelMapper.map(userDTO , User.class) ;
-        user.setJoining_LocalDate(LocalDate.now());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        user.setJoining_LocalDate(LocalDate.now());
         user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         /*roles*/
         Role role = roleRepository.findById(AppConstants.NORMAL_USER).get();
         user.getRoles().add(role);
 
         User createdUser = userRepository.save(user) ;
+
+
+        /* Set shift */
+        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
+        this.enrolledToBatch(createdUser.getId() , batchId) ;
+
         return modelMapper.map(createdUser , UserDTO.class) ;
     }
 

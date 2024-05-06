@@ -1,106 +1,58 @@
 package com.project.attendance.ServiceImpl;
 
-import com.project.attendance.Exception.ResourceNotFoundException;
-import com.project.attendance.Model.Batch;
-import com.project.attendance.Model.Staff;
-import com.project.attendance.Payload.BatchDTO;
-import com.project.attendance.Payload.StaffDTO;
+import com.project.attendance.Config.AppConstants;
+import com.project.attendance.Model.Role;
+import com.project.attendance.Model.User;
+import com.project.attendance.Payload.UserDTO;
 import com.project.attendance.Repository.BatchRepository;
-import com.project.attendance.Repository.StaffRepository;
+import com.project.attendance.Repository.RoleRepository;
+import com.project.attendance.Repository.UserRepository;
 import com.project.attendance.Service.StaffService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.time.LocalDate;
 
 @Service
 public class StaffServiceImpl implements StaffService {
 
     @Autowired
-    StaffRepository staffRepository ;
+    UserRepository userRepository ;
 
     @Autowired
-    BatchRepository batchRepository ;
+    PasswordEncoder passwordEncoder ;
+
+    @Autowired
+    RoleRepository roleRepository ;
 
     @Autowired
     ModelMapper modelMapper ;
 
-    @Override
-    public StaffDTO createStaff(StaffDTO staffDTO) {
-        Staff staff = modelMapper.map(staffDTO , Staff.class) ;
-        Staff createdStaff = staffRepository.save(staff) ;
-        return modelMapper.map(createdStaff , StaffDTO.class) ;
-    }
+    @Autowired
+    UserServiceImpl userService ;
 
     @Override
-    public StaffDTO updateStaff(Integer staffId, StaffDTO staffDTO) {
-        Staff staff = staffRepository.findById(staffId)
-                .orElseThrow(()-> new ResourceNotFoundException("Staff" , "staffId" , staffId));
+    public UserDTO createStaff(UserDTO userDTO) {
+        User user = modelMapper.map(userDTO , User.class) ;
 
-        if (Objects.nonNull(staffDTO.getMobile_no()) && !staffDTO.getMobile_no().isEmpty()) {
-            staff.setMobile_no(staffDTO.getMobile_no());
-        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setJoining_LocalDate(LocalDate.now());
+        user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
 
-        if (Objects.nonNull(staffDTO.getEmail()) && !staffDTO.getEmail().isEmpty()) {
-            staff.setEmail(staffDTO.getEmail());
-        }
+        /*roles*/
+        Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
+        user.getRoles().add(role);
 
-        if (Objects.nonNull(staffDTO.getFirstName()) && !staffDTO.getFirstName().isEmpty()) {
-            staff.setFirstName(staffDTO.getFirstName());
-        }
+        User createdUser = userRepository.save(user) ;
 
-        if (Objects.nonNull(staffDTO.getLastName()) && !staffDTO.getLastName().isEmpty()) {
-            staff.setLastName(staffDTO.getLastName());
-        }
+        /* Set shift */
+        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
+        userService.enrolledToBatch(createdUser.getId() , batchId) ;
 
-        if (Objects.nonNull(staffDTO.getAddress()) && !staffDTO.getAddress().isEmpty()) {
-            staff.setAddress(staffDTO.getAddress());
-        }
-
-        if (Objects.nonNull(staffDTO.getPassword()) && !staffDTO.getPassword().isEmpty()) {
-            staff.setPassword(staffDTO.getPassword());
-        }
-
-        Staff updatedStaff = staffRepository.save(staff) ;
-        return modelMapper.map(updatedStaff , StaffDTO.class) ;
+        return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
-    @Override
-    public void deleteStaff(Integer staffId) {
-        Staff staff = staffRepository.findById(staffId)
-                .orElseThrow(()-> new ResourceNotFoundException("Staff" , "staffId" , staffId));
-
-        List<Batch> batches = staff.getBatches() ;
-
-        for(Batch b : batches){
-            b.setStaff(null);
-            batchRepository.save(b) ;
-        }
-
-        staffRepository.deleteById(staffId);
-        return ;
-    }
-
-    @Override
-    public List<StaffDTO> getAllStaff() {
-        List<Staff> staffs = staffRepository.findAll() ;
-
-        List<StaffDTO> staffDTOS= staffs.stream()
-                .map(staff -> modelMapper.map(staff , StaffDTO.class))
-                .collect(Collectors.toList()) ;
-
-        return staffDTOS ;
-    }
-
-    @Override
-    public StaffDTO getStaffById(Integer staffId) {
-        Staff staff = staffRepository.findById(staffId)
-                .orElseThrow(()-> new ResourceNotFoundException("Staff" , "staffId" , staffId));
-        return modelMapper.map(staff , StaffDTO.class) ;
-    }
+//    public void personalTrainingEnrollment(Integer staffID , Integer userID)
 }

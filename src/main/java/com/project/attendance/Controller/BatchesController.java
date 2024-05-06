@@ -17,42 +17,42 @@ public class BatchesController {
     @Autowired
     BatchServiceImpl batchService ;
 
-    @PostMapping("")
-    public ResponseEntity<BatchDTO> createBatch(@RequestBody BatchDTO batchDTO){
-        BatchDTO createdBatch = batchService.createBatch(batchDTO) ;
-        return ResponseEntity.ok(createdBatch) ;
-    }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<List<BatchDTO>> getAllBatch(){
         List<BatchDTO> allBatches = batchService.getAllBatches() ;
         return ResponseEntity.ok(allBatches) ;
     }
 
     @GetMapping("/{batchId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<BatchDTO> getBatchById(@PathVariable Integer batchId){
         BatchDTO batchDTO = batchService.getBatchById(batchId) ;
         return ResponseEntity.ok(batchDTO) ;
     }
 
     @PutMapping("/{batchId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<BatchDTO> updateBatch(@PathVariable Integer batchId ,
                                                 @RequestBody BatchDTO batchDTO){
         BatchDTO updateBatch = batchService.updateBatch(batchId , batchDTO) ;
         return ResponseEntity.ok(updateBatch) ;
     }
 
-    @GetMapping("/staff/{staffId}")
-    public ResponseEntity<List<BatchDTO>> getBatchByStaff(@PathVariable Integer staffId){
-        List<BatchDTO> allBatches = batchService.getBatchByStaff(staffId) ;
-        return ResponseEntity.ok(allBatches) ;
-    }
+//    @GetMapping("/staff/{staffId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<List<BatchDTO>> getBatchByStaff(@PathVariable Integer staffId){
+//        List<BatchDTO> allBatches = batchService.getBatchByStaff(staffId) ;
+//        return ResponseEntity.ok(allBatches) ;
+//    }
 
-
-    @PostMapping("/enroll/batch/{batchId}/staff/{staffId}")
-    public ResponseEntity<BatchDTO> enrollStaffToBatch(@PathVariable Integer staffId ,
-                                                             @PathVariable Integer batchId){
-        BatchDTO batch = batchService.enrollStaffToBatch(staffId , batchId ) ;
-        return ResponseEntity.ok(batch) ;
-    }
+//
+//    @PostMapping("/enroll/batch/{batchId}/staff/{staffId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<BatchDTO> enrollStaffToBatch(@PathVariable Integer staffId ,
+//                                                             @PathVariable Integer batchId){
+//        BatchDTO batch = batchService.enrollStaffToBatch(staffId , batchId ) ;
+//        return ResponseEntity.ok(batch) ;
+//    }
 }

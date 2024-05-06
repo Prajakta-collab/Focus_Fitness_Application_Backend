@@ -1,10 +1,13 @@
 package com.project.attendance.Controller;
 
+import com.project.attendance.Config.Utility;
 import com.project.attendance.Model.Batch;
 import com.project.attendance.Payload.UserDTO;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,23 +20,30 @@ public class UserController {
     @Autowired
     UserServiceImpl userService ;
 
+    @Autowired
+    Utility utility ;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<List<UserDTO>> getAllUser(){
         List<UserDTO> allUsers = userService.getAllUser() ;
         return ResponseEntity.ok(allUsers) ;
     }
 
     @GetMapping("{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer userId){
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer userId ,
+                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+
+        utility.validateUser(token , userId);
         UserDTO user = userService.getUserById(userId) ;
         return ResponseEntity.ok(user) ;
     }
 
     @PutMapping("{userId}")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO ,
-                                               @PathVariable Integer userId){
+                                              @PathVariable Integer userId ,
+                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        utility.validateUser(token , userId);
         UserDTO updatedUser = userService.updateUser(userDTO , userId) ;
         return ResponseEntity.ok(updatedUser) ;
     }
@@ -46,20 +56,21 @@ public class UserController {
     }
 
     @GetMapping("/shift")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<List<UserDTO>> getAllUserByShift(@RequestParam String shift){
         List<UserDTO> userDTOS = userService.getAllUserByShift(shift) ;
         return ResponseEntity.ok(userDTOS) ;
     }
 
-    @PostMapping("/enroll/user/{userId}/batch/{batchId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<UserDTO> enrollToBatch(@PathVariable Integer userId ,
-                                                 @PathVariable Integer batchId){
-
-        UserDTO updatedUser = userService.enrolledToBatch(userId , batchId) ;
-        return ResponseEntity.ok(updatedUser) ;
-    }
+//
+//    @PostMapping("/enroll/user/{userId}/batch/{batchId}")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
+//    public ResponseEntity<UserDTO> enrollToBatch(@PathVariable Integer userId ,
+//                                                 @PathVariable Integer batchId){
+//
+//        UserDTO updatedUser = userService.enrolledToBatch(userId , batchId) ;
+//        return ResponseEntity.ok(updatedUser) ;
+//    }
 }
 
 

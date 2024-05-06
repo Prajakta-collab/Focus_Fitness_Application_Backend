@@ -3,6 +3,7 @@ package com.project.attendance.Exception;
 import com.project.attendance.Payload.ApiResponse;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -30,4 +31,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.ok(apiResponse) ;
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse> AccessDeniedExceptionHandler(AccessDeniedException e){
+        String message = e.getMessage() ;
+        ApiResponse apiResponse = new ApiResponse(message , false) ;
+        return ResponseEntity.ok(apiResponse) ;
+    }
 }
