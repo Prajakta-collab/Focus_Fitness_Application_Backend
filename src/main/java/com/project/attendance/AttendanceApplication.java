@@ -27,7 +27,6 @@ public class AttendanceApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//System.out.println(passwordEncoder.encode("xyz"));
 
 		try{
 			Role role1 = new Role() ;
