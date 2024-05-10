@@ -55,9 +55,13 @@ public class UserServiceImpl implements UserService {
 
 
         /* Set shift */
-        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
-        this.enrolledToBatch(createdUser.getId() , batchId) ;
+        int batchId = 1 ;
 
+        if(createdUser.getShift().equals("Evening")){
+            batchId = 2 ;
+        }
+
+        this.enrolledToBatch(createdUser.getId() , batchId) ;
         return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
