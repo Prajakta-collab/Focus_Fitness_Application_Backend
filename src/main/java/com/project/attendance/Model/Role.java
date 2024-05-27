@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 
+import java.io.Serializable;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-public class Role {
+public class Role implements Serializable {
 
     @Id
     private Integer id ;

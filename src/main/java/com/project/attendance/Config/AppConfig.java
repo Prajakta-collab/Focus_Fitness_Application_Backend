@@ -3,6 +3,7 @@ package com.project.attendance.Config;
 import com.project.attendance.security.CustomUserDetailService;
 import com.project.attendance.security.JwtAuthenticationEntryPoint;
 import com.project.attendance.security.JwtAuthenticationFilter;
+import com.project.attendance.security.JwtExpirationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,9 @@ public class AppConfig{
     JwtAuthenticationFilter jwtAuthenticationFilter ;
 
     @Autowired
+    JwtExpirationFilter jwtExpirationFilter ;
+
+    @Autowired
     CustomUserDetailService customUserDetailService ;
 
     /* Used To Change Form Based Authentication to Javascript Authentication */
@@ -48,6 +52,7 @@ public class AppConfig{
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtExpirationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

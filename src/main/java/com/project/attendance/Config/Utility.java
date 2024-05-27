@@ -29,6 +29,7 @@ public class Utility {
         }
 
         if(!user.getId().equals(id)){
+            System.out.println("Check :- token user" + user.getId() + " --  owner" + id );
             throw new AccessDeniedException("Unauthorized access to data") ;
         }
     }

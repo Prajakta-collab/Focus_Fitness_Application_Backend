@@ -63,8 +63,6 @@ public class AttendanceApplication implements CommandLineRunner {
 			batchRepository.save(morningBatch) ;
 			batchRepository.save(eveningBatch) ;
 
-
-
 		}catch (Exception e){
 			System.out.println(e);
 		}

@@ -4,12 +4,13 @@ import com.project.attendance.Payload.UserDTO;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "batches")
-public class Batch {
+public class Batch implements Serializable {
 
 
     public Integer getId() {
