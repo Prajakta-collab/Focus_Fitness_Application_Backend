@@ -1,7 +1,6 @@
 package com.project.attendance.Service;
 
-import com.project.attendance.Payload.BatchDTO;
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.DTO.BatchDTO;
 
 import java.util.List;
 

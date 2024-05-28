@@ -1,5 +1,6 @@
-package com.project.attendance.Config;
+package com.project.attendance.Utilities;
 
+import com.project.attendance.Config.AppConstants;
 import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.User;
 import com.project.attendance.Repository.UserRepository;

@@ -2,7 +2,7 @@ package com.project.attendance.ServiceImpl;
 
 import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.Batch;
-import com.project.attendance.Payload.BatchDTO;
+import com.project.attendance.Payload.DTO.BatchDTO;
 import com.project.attendance.Repository.BatchRepository;
 import com.project.attendance.Service.BatchService;
 import org.modelmapper.ModelMapper;

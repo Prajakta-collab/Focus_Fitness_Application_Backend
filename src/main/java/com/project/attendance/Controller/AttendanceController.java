@@ -1,23 +1,18 @@
 package com.project.attendance.Controller;
 
-import com.project.attendance.Config.AppConstants;
-import com.project.attendance.Config.Utility;
-import com.project.attendance.Payload.ApiResponse;
-import com.project.attendance.Payload.AttendanceDTO;
-import com.project.attendance.Payload.UserDTO;
-import com.project.attendance.Repository.UserRepository;
+import com.project.attendance.Payload.Response.AttendanceResponse;
+import com.project.attendance.Utilities.Utility;
+import com.project.attendance.Payload.Response.ApiResponse;
+import com.project.attendance.Payload.DTO.AttendanceDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.ServiceImpl.AttendanceServiceImpl;
-import com.project.attendance.ServiceImpl.UserServiceImpl;
-import com.project.attendance.security.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -47,10 +42,10 @@ public class AttendanceController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LocalDate>> getAllPresentDays(@RequestParam Integer userId ,
-                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        List<LocalDate> presentDates = attendanceService.getAllPresentDays(userId) ;
-        return ResponseEntity.ok(presentDates) ;
+    public ResponseEntity<AttendanceResponse> getAllPresentDays(@RequestParam Integer userId ,
+                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        AttendanceResponse res = attendanceService.getAllPresentDays(userId) ;
+        return ResponseEntity.ok(res) ;
     }
 
     @GetMapping("/batch")

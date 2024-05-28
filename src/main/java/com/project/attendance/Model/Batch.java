@@ -1,8 +1,6 @@
 package com.project.attendance.Model;
 
-import com.project.attendance.Payload.UserDTO;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
 import java.time.LocalDate;

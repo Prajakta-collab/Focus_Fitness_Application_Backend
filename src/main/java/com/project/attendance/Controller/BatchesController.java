@@ -1,6 +1,6 @@
 package com.project.attendance.Controller;
 
-import com.project.attendance.Payload.BatchDTO;
+import com.project.attendance.Payload.DTO.BatchDTO;
 import com.project.attendance.ServiceImpl.BatchServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

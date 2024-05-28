@@ -1,8 +1,6 @@
 package com.project.attendance.Model;
 
-import com.project.attendance.Payload.UserDTO;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

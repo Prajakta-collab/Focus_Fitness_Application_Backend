@@ -1,7 +1,7 @@
-package com.project.attendance.Payload;
+package com.project.attendance.Payload.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.attendance.Model.Batch;
+import com.project.attendance.Payload.DTO.BatchDTO;
 
 import java.time.LocalDate;
 

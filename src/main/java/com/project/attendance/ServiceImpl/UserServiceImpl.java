@@ -5,7 +5,7 @@ import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.Batch;
 import com.project.attendance.Model.Role;
 import com.project.attendance.Model.User;
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.Repository.BatchRepository;
 import com.project.attendance.Repository.RoleRepository;
 import com.project.attendance.Repository.UserRepository;
@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

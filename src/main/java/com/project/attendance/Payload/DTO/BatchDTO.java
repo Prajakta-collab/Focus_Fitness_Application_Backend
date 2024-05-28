@@ -1,4 +1,4 @@
-package com.project.attendance.Payload;
+package com.project.attendance.Payload.DTO;
 
 import java.time.LocalDate;
 import java.util.List;

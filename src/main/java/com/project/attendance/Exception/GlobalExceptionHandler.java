@@ -1,6 +1,6 @@
 package com.project.attendance.Exception;
 
-import com.project.attendance.Payload.ApiResponse;
+import com.project.attendance.Payload.Response.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
 import org.springframework.dao.DuplicateKeyException;

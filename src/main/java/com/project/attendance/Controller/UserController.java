@@ -1,13 +1,11 @@
 package com.project.attendance.Controller;
 
-import com.project.attendance.Config.Utility;
-import com.project.attendance.Model.Batch;
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Utilities.Utility;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

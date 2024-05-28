@@ -1,4 +1,4 @@
-package com.project.attendance.Payload;
+package com.project.attendance.Payload.DTO;
 
 import com.project.attendance.Model.Batch;
 import com.project.attendance.Model.User;

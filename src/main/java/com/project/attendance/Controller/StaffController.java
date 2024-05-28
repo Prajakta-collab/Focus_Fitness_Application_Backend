@@ -1,6 +1,6 @@
 package com.project.attendance.Controller;
 
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.ServiceImpl.StaffServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

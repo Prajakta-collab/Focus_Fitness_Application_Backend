@@ -1,6 +1,6 @@
 package com.project.attendance.Service;
 
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
 
 import java.util.List;
 

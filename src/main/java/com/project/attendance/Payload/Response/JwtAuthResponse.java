@@ -1,4 +1,4 @@
-package com.project.attendance.Payload;
+package com.project.attendance.Payload.Response;
 
 import com.project.attendance.Model.RefreshToken;
 import lombok.*;

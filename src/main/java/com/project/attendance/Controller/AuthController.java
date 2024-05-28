@@ -1,25 +1,15 @@
 package com.project.attendance.Controller;
 
-import com.project.attendance.Exception.ResourceNotFoundException;
-import com.project.attendance.Model.RefreshToken;
-import com.project.attendance.Model.User;
-import com.project.attendance.Payload.JwtAuthRequest;
-import com.project.attendance.Payload.JwtAuthResponse;
-import com.project.attendance.Payload.RefreshTokenRequestDTO;
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.Requests.JwtAuthRequest;
+import com.project.attendance.Payload.Response.JwtAuthResponse;
+import com.project.attendance.Payload.Requests.RefreshTokenRequestDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.ServiceImpl.AuthServiceImpl;
-import com.project.attendance.ServiceImpl.RefreshTokenService;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
-import com.project.attendance.security.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

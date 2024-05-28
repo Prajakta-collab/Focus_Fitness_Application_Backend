@@ -4,9 +4,10 @@ import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.Attendance;
 import com.project.attendance.Model.Batch;
 import com.project.attendance.Model.User;
-import com.project.attendance.Payload.AttendanceDTO;
+import com.project.attendance.Payload.DTO.AttendanceDTO;
 import com.project.attendance.Exception.SubscriptionExpireException;
-import com.project.attendance.Payload.UserDTO;
+import com.project.attendance.Payload.DTO.UserDTO;
+import com.project.attendance.Payload.Response.AttendanceResponse;
 import com.project.attendance.Repository.AttendanceRepository;
 import com.project.attendance.Repository.BatchRepository;
 import com.project.attendance.Repository.UserRepository;
@@ -64,15 +65,35 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<LocalDate> getAllPresentDays(Integer userId) {
+    public AttendanceResponse getAllPresentDays(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
         List<Attendance> allAttendance = attendanceRepository.findByUser(user) ;
 
-        return allAttendance.stream()
+        List<LocalDate> presentDays = allAttendance.stream()
                 .map(Attendance::getPresentDate)
-                .collect(Collectors.toList());
+                .toList();
+
+        int currentStreak = 0;
+        int maxStreak = 0;
+        LocalDate lastDate = null;
+
+        for (LocalDate date : presentDays) {
+            if (lastDate == null || lastDate.plusDays(1).isEqual(date)) {
+                currentStreak++;
+            } else {
+                maxStreak = Math.max(maxStreak, currentStreak);
+                currentStreak = 1;
+            }
+            lastDate = date;
+        }
+        maxStreak = Math.max(maxStreak, currentStreak);
+
+        return AttendanceResponse.builder()
+                .presentDays(presentDays)
+                .maxStreak(maxStreak)
+                .build() ;
     }
 
     @Override
