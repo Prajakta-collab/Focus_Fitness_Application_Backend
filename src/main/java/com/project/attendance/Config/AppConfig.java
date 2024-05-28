@@ -2,8 +2,8 @@ package com.project.attendance.Config;
 
 import com.project.attendance.security.CustomUserDetailService;
 import com.project.attendance.security.JwtAuthenticationEntryPoint;
-import com.project.attendance.security.JwtAuthenticationFilter;
-import com.project.attendance.security.JwtExpirationFilter;
+import com.project.attendance.Filter.JwtAuthenticationFilter;
+import com.project.attendance.Filter.JwtExpirationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
