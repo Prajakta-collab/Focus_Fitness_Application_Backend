@@ -17,24 +17,23 @@ public class BatchesController {
     @Autowired
     BatchServiceImpl batchService ;
 
-
-    @GetMapping("")
+    @GetMapping("/all_batches")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<List<BatchDTO>> getAllBatch(){
         List<BatchDTO> allBatches = batchService.getAllBatches() ;
         return ResponseEntity.ok(allBatches) ;
     }
 
-    @GetMapping("/{batchId}")
+    @GetMapping()
     @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
-    public ResponseEntity<BatchDTO> getBatchById(@PathVariable Integer batchId){
+    public ResponseEntity<BatchDTO> getBatchById(@RequestHeader("batchId") Integer batchId){
         BatchDTO batchDTO = batchService.getBatchById(batchId) ;
         return ResponseEntity.ok(batchDTO) ;
     }
 
-    @PutMapping("/{batchId}")
+    @PutMapping()
     @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
-    public ResponseEntity<BatchDTO> updateBatch(@PathVariable Integer batchId ,
+    public ResponseEntity<BatchDTO> updateBatch(@RequestHeader("batchId") Integer batchId ,
                                                 @RequestBody BatchDTO batchDTO){
         BatchDTO updateBatch = batchService.updateBatch(batchId , batchDTO) ;
         return ResponseEntity.ok(updateBatch) ;

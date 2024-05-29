@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -21,34 +25,50 @@ public class UserController {
     @Autowired
     Utility utility ;
 
-    @GetMapping("")
+    @GetMapping("/all_users")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
     public ResponseEntity<List<UserDTO>> getAllUser(){
         List<UserDTO> allUsers = userService.getAllUser() ;
         return ResponseEntity.ok(allUsers) ;
     }
 
-    @GetMapping("{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer userId ,
-                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    @GetMapping()
+    public ResponseEntity<UserDTO> getUserById(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
 
-        utility.validateUser(token , userId);
-        UserDTO user = userService.getUserById(userId) ;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String username = authentication.getName() ;
+
+        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+
+        //Validating user
+        utility.validateUser(token , username , authorities);
+
+        UserDTO user = userService.getUserById(loggedInUser.getId()) ;
         return ResponseEntity.ok(user) ;
     }
 
-    @PutMapping("{userId}")
+    @PutMapping()
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO ,
-                                              @PathVariable Integer userId ,
                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        utility.validateUser(token , userId);
-        UserDTO updatedUser = userService.updateUser(userDTO , userId) ;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String username = authentication.getName() ;
+
+        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+
+        //Validating user
+        utility.validateUser(token , username , authorities);
+
+        UserDTO updatedUser = userService.updateUser(userDTO , loggedInUser.getId()) ;
         return ResponseEntity.ok(updatedUser) ;
     }
 
-    @DeleteMapping("{userId}")
+    @DeleteMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer userId){
+    public ResponseEntity<?> deleteUser(@RequestHeader("userId") Integer userId){
         userService.deleteUser(userId); ;
         return ResponseEntity.ok("Deleted Successfully") ;
     }

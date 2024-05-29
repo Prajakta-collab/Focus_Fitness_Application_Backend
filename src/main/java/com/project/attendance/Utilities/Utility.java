@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 
 @Configuration
@@ -17,20 +20,21 @@ public class Utility {
     @Autowired
     UserRepository userRepository ;
 
-    public void validateUser(String token , Integer id) {
+    public void validateUser(String token , String email , Collection<? extends GrantedAuthority> authorities) {
+
         String actualToken = token.substring(7); // Remove "Bearer " prefix
         String username = Jwts.parser().setSigningKey(String.valueOf(AppConstants.JWT_SECRET)).parseClaimsJws(actualToken).getBody().getSubject();
 
-        User user = userRepository.findByEmail(username).orElseThrow(()-> new ResourceNotFoundException("User" , "Email :- " + username , 0));
-
 
         /* Admin can access anything so returning same id to show same person is accessing */
-        if(user.getRoles().contains("ROLE_ADMIN")){
-            return ;
+        for (GrantedAuthority authority : authorities) {
+            if (authority.getAuthority().equals("ROLE_ADMIN")) {
+                return;
+            }
         }
 
-        if(!user.getId().equals(id)){
-            System.out.println("Check :- token user" + user.getId() + " --  owner" + id );
+        if(!username.equals(email)){
+            System.out.println("Check :- token user" + username + " --  owner" + email );
             throw new AccessDeniedException("Unauthorized access to data") ;
         }
     }

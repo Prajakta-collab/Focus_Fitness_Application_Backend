@@ -3,6 +3,7 @@ package com.project.attendance.ServiceImpl;
 import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.RefreshToken;
 import com.project.attendance.Model.User;
+import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.Payload.Requests.JwtAuthRequest;
 import com.project.attendance.Payload.Response.JwtAuthResponse;
 import com.project.attendance.Payload.Requests.RefreshTokenRequestDTO;
@@ -11,9 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.Objects;
 
 @Service
 public class AuthServiceImpl {
@@ -23,6 +30,9 @@ public class AuthServiceImpl {
 
     @Autowired
     private AuthenticationManager manager ;
+
+    @Autowired
+    private UserServiceImpl userService ;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -41,7 +51,6 @@ public class AuthServiceImpl {
         /* Refresh Token - If user is log in successfully  */
         RefreshToken refreshToken =  refreshTokenService.createRefreshToken(request.getUsername()) ;
 
-
         JwtAuthResponse response = new JwtAuthResponse() ;
         response.setToken(token) ;
         response.setRefreshToken(refreshToken.getToken());
@@ -50,6 +59,7 @@ public class AuthServiceImpl {
     }
 
     public JwtAuthResponse createAccessToken(RefreshTokenRequestDTO refreshTokenRequestDTO){
+
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
                 .orElseThrow(() -> new ResourceNotFoundException("RefreshToken Not found" , "" + refreshTokenRequestDTO.getToken() , 0)) ;
 

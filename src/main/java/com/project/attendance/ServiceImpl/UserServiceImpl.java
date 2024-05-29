@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
+
     @Override
     public List<UserDTO> getAllUser() {
         List<User> users = userRepository.findAll() ;
@@ -73,6 +74,14 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList()) ;
 
         return userDTOs ;
+    }
+
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "email" + email , 0));
+
+        return modelMapper.map(user , UserDTO.class) ;
     }
 
     @Override

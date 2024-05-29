@@ -39,14 +39,13 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
-    public RefreshToken verifyExpiration(RefreshToken token){
+    public void verifyExpiration(RefreshToken token){
 
-        if(token.getExpiryDate().compareTo(Instant.now())>0){
+        if(token.getExpiryDate().isBefore(Instant.now())){
             refreshTokenRepository.delete(token);
             throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
         }
 
-        return token;
     }
 
 }
