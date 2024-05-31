@@ -1,6 +1,7 @@
 package com.project.attendance.ServiceImpl;
 
 import com.project.attendance.Config.AppConstants;
+import com.project.attendance.Exception.InternalServerException;
 import com.project.attendance.Model.Role;
 import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
@@ -34,23 +35,28 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public UserDTO createStaff(UserDTO userDTO) {
-        User user = modelMapper.map(userDTO , User.class) ;
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setJoining_LocalDate(LocalDate.now());
-        user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
+        try{
+            User user = modelMapper.map(userDTO , User.class) ;
 
-        /*roles*/
-        Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
-        user.getRoles().add(role);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setJoining_LocalDate(LocalDate.now());
+            user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
 
-        User createdUser = userRepository.save(user) ;
+            /*roles*/
+            Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
+            user.getRoles().add(role);
 
-        /* Set shift */
-        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
-        userService.enrolledToBatch(createdUser.getId() , batchId) ;
+            User createdUser = userRepository.save(user) ;
 
-        return modelMapper.map(createdUser , UserDTO.class) ;
+            /* Set shift */
+            Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
+            userService.enrolledToBatch(createdUser.getId() , batchId) ;
+
+            return modelMapper.map(createdUser , UserDTO.class) ;
+        }catch (Exception ex) {
+            throw new InternalServerException("Internal Server Error");
+        }
     }
 
 //    public void personalTrainingEnrollment(Integer staffID , Integer userID)

@@ -1,5 +1,6 @@
 package com.project.attendance.ServiceImpl;
 
+import com.project.attendance.Exception.InternalServerException;
 import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.Batch;
 import com.project.attendance.Payload.DTO.BatchDTO;
@@ -31,33 +32,46 @@ public class BatchServiceImpl implements BatchService {
 
     @Override
     public List<BatchDTO> getAllBatches() {
-        List<Batch> batches = batchRepository.findAll() ;
+        try{
+            List<Batch> batches = batchRepository.findAll() ;
 
-        List<BatchDTO> batchDTOs= batches.stream()
-                .map(batch -> modelMapper.map(batch , BatchDTO.class))
-                .collect(Collectors.toList()) ;
-
-        return batchDTOs ;
+            return batches.stream()
+                    .map(batch -> modelMapper.map(batch , BatchDTO.class))
+                    .collect(Collectors.toList());
+        }catch (Exception ex) {
+            throw new InternalServerException("Internal Server Error");
+        }
     }
 
     @Override
     public BatchDTO getBatchById(Integer batchId) {
-        Batch batch = batchRepository.findById(batchId)
-                .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
-        return modelMapper.map(batch , BatchDTO.class) ;
+        try{
+            Batch batch = batchRepository.findById(batchId)
+                    .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
+            return modelMapper.map(batch , BatchDTO.class) ;
+        }catch (Exception ex) {
+            throw new InternalServerException("Internal Server Error");
+        }
     }
 
     @Override
     public BatchDTO updateBatch(Integer batchId, BatchDTO batchDTO) {
-        Batch batch = batchRepository.findById(batchId)
-                .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
+        try{
 
-        if(batchDTO.getBatchName() != ""){
-            batch.setBatchName(batchDTO.getBatchName());
+            Batch batch = batchRepository.findById(batchId)
+                    .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
+
+            if(batchDTO.getBatchName() != ""){
+                batch.setBatchName(batchDTO.getBatchName());
+            }
+
+
+            Batch updatedBatch = batchRepository.save(batch) ;
+            return modelMapper.map(updatedBatch , BatchDTO.class) ;
+
+        }catch (Exception ex) {
+            throw new InternalServerException("Internal Server Error");
         }
 
-
-        Batch updatedBatch = batchRepository.save(batch) ;
-        return modelMapper.map(updatedBatch , BatchDTO.class) ;
     }
 }

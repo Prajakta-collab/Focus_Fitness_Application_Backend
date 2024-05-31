@@ -43,7 +43,7 @@ public class JwtExpirationFilter extends OncePerRequestFilter {
 
 
     private void handleExpiredTokenResponse(HttpServletResponse response, String token) throws IOException {
-        ApiResponse apiResponse = new ApiResponse("JWT token has expired", false);
+        ApiResponse apiResponse = new ApiResponse("JWT token has expired", Boolean.FALSE , this.getClass().getSimpleName());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);

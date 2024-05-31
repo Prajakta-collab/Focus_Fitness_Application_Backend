@@ -16,4 +16,5 @@ import java.util.List;
 public class AttendanceResponse {
     List<LocalDate> presentDays ;
     int maxStreak ;
+    private Boolean success ;
 }
