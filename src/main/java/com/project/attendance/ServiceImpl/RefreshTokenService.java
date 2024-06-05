@@ -1,9 +1,11 @@
 package com.project.attendance.ServiceImpl;
 
 import com.project.attendance.Exception.InternalServerException;
+import com.project.attendance.Exception.ResourceExpireException;
 import com.project.attendance.Exception.ResourceNotFoundException;
 import com.project.attendance.Model.RefreshToken;
 import com.project.attendance.Model.User;
+import com.project.attendance.Payload.Response.RefreshTokenResponse;
 import com.project.attendance.Repository.RefreshTokenRepository;
 import com.project.attendance.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,24 +25,33 @@ public class RefreshTokenService {
     UserRepository userRepository;
 
     public RefreshToken createRefreshToken(String email){
-
-        try{
-            User userInfoExtracted = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new ResourceNotFoundException("email" , "email" + email ,  0));;
+        User userInfoExtracted = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ResourceNotFoundException("email" , "email" + email ,  0));;
 
 
-            RefreshToken refreshToken = RefreshToken.builder()
-                    .user(userInfoExtracted)
-                    .token(UUID.randomUUID().toString())
-                    .expiryDate(Instant.now().plusMillis(864000000))
-                    .build();
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(userInfoExtracted)
+                .token(UUID.randomUUID().toString())
+                .expiryDate(Instant.now().plusMillis(864000000))
+                .build();
 
-            return refreshTokenRepository.save(refreshToken);
-        }catch (Exception ex) {
-            throw new InternalServerException(ex.getMessage());
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    public RefreshTokenResponse getRefreshTokenByEmail(String email) {
+        RefreshToken refreshToken = refreshTokenRepository.findByUserEmail(email);
+
+        if(refreshToken != null){
+            return RefreshTokenResponse.builder()
+                    .refreshToken(refreshToken.getToken())
+                            .success(Boolean.TRUE)
+                                    .build() ;
+        }else{
+            return RefreshTokenResponse.builder()
+                    .refreshToken(null)
+                    .success(Boolean.FALSE)
+                    .build() ;
         }
-
-
     }
 
     public Optional<RefreshToken> findByToken(String token){
@@ -49,22 +60,13 @@ public class RefreshTokenService {
         }catch (Exception ex) {
             throw new InternalServerException("Internal Server Error");
         }
-
     }
 
     public void verifyExpiration(RefreshToken token){
-
-        try{
-
-            if(token.getExpiryDate().isBefore(Instant.now())){
-                refreshTokenRepository.delete(token);
-                throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
-            }
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
+        if(token.getExpiryDate().isBefore(Instant.now())){
+            refreshTokenRepository.delete(token);
+            throw new ResourceExpireException(token.getToken() + " Refresh token is expired. Please make a new login..!");
         }
-
     }
 
 }

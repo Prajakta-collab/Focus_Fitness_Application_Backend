@@ -36,27 +36,23 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public UserDTO createStaff(UserDTO userDTO) {
 
-        try{
-            User user = modelMapper.map(userDTO , User.class) ;
+        User user = modelMapper.map(userDTO , User.class) ;
 
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setJoining_LocalDate(LocalDate.now());
-            user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setJoining_LocalDate(LocalDate.now());
+        user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
 
-            /*roles*/
-            Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
-            user.getRoles().add(role);
+        /*roles*/
+        Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
+        user.getRoles().add(role);
 
-            User createdUser = userRepository.save(user) ;
+        User createdUser = userRepository.save(user) ;
 
-            /* Set shift */
-            Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
-            userService.enrolledToBatch(createdUser.getId() , batchId) ;
+        /* Set shift */
+        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
+        userService.enrolledToBatch(createdUser.getId() , batchId) ;
 
-            return modelMapper.map(createdUser , UserDTO.class) ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
 //    public void personalTrainingEnrollment(Integer staffID , Integer userID)

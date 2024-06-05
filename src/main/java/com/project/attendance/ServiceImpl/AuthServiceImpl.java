@@ -43,77 +43,57 @@ public class AuthServiceImpl {
 
 
     public JwtAuthResponse login(JwtAuthRequest request){
+        this.doAuthenticate(request.getUsername(), request.getPassword());
 
-        try{
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+        String token = this.helper.generateToken(userDetails);
 
-            this.doAuthenticate(request.getUsername(), request.getPassword());
+        /* Refresh Token - If user is log in successfully  */
+        RefreshToken refreshToken =  refreshTokenService.createRefreshToken(request.getUsername()) ;
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-            String token = this.helper.generateToken(userDetails);
+        JwtAuthResponse response = new JwtAuthResponse() ;
+        response.setToken(token) ;
+        response.setSuccess(Boolean.TRUE);
+        response.setRefreshToken(refreshToken.getToken());
 
-            /* Refresh Token - If user is log in successfully  */
-            RefreshToken refreshToken =  refreshTokenService.createRefreshToken(request.getUsername()) ;
-
-            JwtAuthResponse response = new JwtAuthResponse() ;
-            response.setToken(token) ;
-            response.setSuccess(Boolean.TRUE);
-            response.setRefreshToken(refreshToken.getToken());
-
-            return response;
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        return response;
     }
 
     public JwtAuthResponse createAccessToken(RefreshTokenRequestDTO refreshTokenRequestDTO){
 
-        try{
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
+                .orElseThrow(() -> new ResourceNotFoundException("RefreshToken Not found" , "" + refreshTokenRequestDTO.getToken() , 0)) ;
 
-            RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
-                    .orElseThrow(() -> new ResourceNotFoundException("RefreshToken Not found" , "" + refreshTokenRequestDTO.getToken() , 0)) ;
+        // Check if expired then throw error
+        refreshTokenService.verifyExpiration(refreshToken);
 
-            // Check if expired then throw error
-            refreshTokenService.verifyExpiration(refreshToken);
+        User user = refreshToken.getUser();
 
-            User user = refreshToken.getUser();
+        // Convert User entity to UserDetails
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                user.getAuthorities()
+        );
 
-            // Convert User entity to UserDetails
-            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getAuthorities()
-            );
+        // Generate new access token
+        String accessToken = helper.generateToken(userDetails);
 
-            // Generate new access token
-            String accessToken = helper.generateToken(userDetails);
-
-            return JwtAuthResponse.builder()
-                    .token(accessToken)
-                    .success(Boolean.TRUE)
-                    .refreshToken(refreshTokenRequestDTO.getToken())
-                    .build();
-
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        return JwtAuthResponse.builder()
+                .token(accessToken)
+                .success(Boolean.TRUE)
+                .refreshToken(refreshTokenRequestDTO.getToken())
+                .build();
     }
 
     public void doAuthenticate(String username, String password) {
 
-        try{
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
-
-            try {
-                manager.authenticate(authentication);
-            } catch (BadCredentialsException e) {
-                throw new BadCredentialsException(" Invalid Username or Password  !!");
-            }
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
+        try {
+            manager.authenticate(authentication);
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException(" Invalid Username or Password  !!");
         }
-
     }
 }

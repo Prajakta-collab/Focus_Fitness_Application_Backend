@@ -4,7 +4,9 @@ import com.project.attendance.Payload.Requests.JwtAuthRequest;
 import com.project.attendance.Payload.Response.JwtAuthResponse;
 import com.project.attendance.Payload.Requests.RefreshTokenRequestDTO;
 import com.project.attendance.Payload.DTO.UserDTO;
+import com.project.attendance.Payload.Response.RefreshTokenResponse;
 import com.project.attendance.ServiceImpl.AuthServiceImpl;
+import com.project.attendance.ServiceImpl.RefreshTokenService;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -21,6 +24,9 @@ public class AuthController {
 
     @Autowired
     UserServiceImpl userService ;
+
+    @Autowired
+    RefreshTokenService refreshTokenService ;
 
     @PostMapping("/signup")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
@@ -39,6 +45,12 @@ public class AuthController {
     public ResponseEntity<JwtAuthResponse> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
         JwtAuthResponse res = authService.createAccessToken(refreshTokenRequestDTO) ;
         return new ResponseEntity<>(res, HttpStatus.OK) ;
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<RefreshTokenResponse> getRefreshTokenByEmail(@RequestHeader("email") String email) {
+        RefreshTokenResponse refreshTokenResponse = refreshTokenService.getRefreshTokenByEmail(email);
+        return new ResponseEntity<>(refreshTokenResponse, HttpStatus.OK) ;
     }
 
 }

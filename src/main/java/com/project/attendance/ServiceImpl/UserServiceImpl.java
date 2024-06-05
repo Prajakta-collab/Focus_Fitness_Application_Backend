@@ -42,34 +42,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserDTO userDTO) {
 
-        try{
+        User user = modelMapper.map(userDTO , User.class) ;
 
-            User user = modelMapper.map(userDTO , User.class) ;
+        user.setJoining_LocalDate(LocalDate.now());
+        user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-            user.setJoining_LocalDate(LocalDate.now());
-            user.setEnd_LocalDate(user.getJoining_LocalDate().plusMonths(user.getDuration()));
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        /*roles*/
+        Role role = roleRepository.findById(AppConstants.NORMAL_USER).get();
+        user.getRoles().add(role);
 
-            /*roles*/
-            Role role = roleRepository.findById(AppConstants.NORMAL_USER).get();
-            user.getRoles().add(role);
-
-            User createdUser = userRepository.save(user) ;
+        User createdUser = userRepository.save(user) ;
 
 
-            /* Set shift */
-            int batchId = 1 ;
+        /* Set shift */
+        int batchId = 1 ;
 
-            if(createdUser.getShift().equals("Evening")){
-                batchId = 2 ;
-            }
-
-            this.enrolledToBatch(createdUser.getId() , batchId) ;
-            return modelMapper.map(createdUser , UserDTO.class) ;
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
+        if(createdUser.getShift().equals("Evening")){
+            batchId = 2 ;
         }
+
+        this.enrolledToBatch(createdUser.getId() , batchId) ;
+        return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
 
@@ -93,115 +87,87 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserByEmail(String email) {
 
-        try{
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "email" + email , 0));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "email" + email , 0));
 
-            return modelMapper.map(user , UserDTO.class) ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        return modelMapper.map(user , UserDTO.class) ;
 
     }
 
     @Override
     public UserDTO getUserById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
-        try{
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
-
-            return modelMapper.map(user , UserDTO.class) ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
-
+        return modelMapper.map(user , UserDTO.class) ;
     }
 
     @Override
     public UserDTO updateUser(UserDTO userDTO, Integer userId) {
 
-        try{
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));;
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));;
 
-            if (Objects.nonNull(userDTO.getFirstName()) && !userDTO.getFirstName().isEmpty()) {
-                user.setFirstName(userDTO.getFirstName());
-            }
-
-            if (Objects.nonNull(userDTO.getLastName()) && !userDTO.getLastName().isEmpty()) {
-                user.setLastName(userDTO.getLastName());
-            }
-
-            if (Objects.nonNull(userDTO.getEnd_LocalDate())) {
-                user.setEnd_LocalDate(userDTO.getEnd_LocalDate());
-            }
-
-
-            if (Objects.nonNull(userDTO.getMobile_no()) && !userDTO.getMobile_no().isEmpty()) {
-                user.setMobile_no(userDTO.getMobile_no());
-            }
-
-            User updatedUser = userRepository.save(user) ;
-            return modelMapper.map(updatedUser , UserDTO.class) ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
+        if (Objects.nonNull(userDTO.getFirstName()) && !userDTO.getFirstName().isEmpty()) {
+            user.setFirstName(userDTO.getFirstName());
         }
+
+        if (Objects.nonNull(userDTO.getLastName()) && !userDTO.getLastName().isEmpty()) {
+            user.setLastName(userDTO.getLastName());
+        }
+
+        if (Objects.nonNull(userDTO.getEnd_LocalDate())) {
+            user.setEnd_LocalDate(userDTO.getEnd_LocalDate());
+        }
+
+
+        if (Objects.nonNull(userDTO.getMobile_no()) && !userDTO.getMobile_no().isEmpty()) {
+            user.setMobile_no(userDTO.getMobile_no());
+        }
+
+        User updatedUser = userRepository.save(user) ;
+        return modelMapper.map(updatedUser , UserDTO.class) ;
 
     }
 
     @Override
     public void deleteUser(Integer userId) {
 
-        try{
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
-            Batch batch = user.getEnrolledBatch();
-            batch.getUsers().remove(user) ;
+        Batch batch = user.getEnrolledBatch();
+        batch.getUsers().remove(user) ;
 
-            userRepository.deleteById(userId);
-            return ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        userRepository.deleteById(userId);
+        return ;
     }
 
     @Override
     public List<UserDTO> getAllUserByShift(String shift) {
+        List<User> allUsers = userRepository.findByShift(shift) ;
 
-        try{
-            List<User> allUsers = userRepository.findByShift(shift) ;
+        List<UserDTO> userDTOs = allUsers.stream()
+                .map(user -> modelMapper.map(user , UserDTO.class))
+                .collect(Collectors.toList()) ;
 
-            List<UserDTO> userDTOs = allUsers.stream()
-                    .map(user -> modelMapper.map(user , UserDTO.class))
-                    .collect(Collectors.toList()) ;
-
-            return userDTOs ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
-
+        return userDTOs ;
     }
 
     @Override
     public UserDTO enrolledToBatch(Integer userId ,Integer batchId) {
 
-        try{
-            Batch batch = batchRepository.findById(batchId)
-                    .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
 
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
-            batch.getUsers().add(user) ;
-            user.setEnrolledBatch(batch);
+        batch.getUsers().add(user) ;
+        user.setEnrolledBatch(batch);
 
-            batchRepository.save(batch) ;
-            User updatedUser = userRepository.save(user) ;
-            return modelMapper.map(updatedUser , UserDTO.class) ;
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        batchRepository.save(batch) ;
+        User updatedUser = userRepository.save(user) ;
+        return modelMapper.map(updatedUser , UserDTO.class) ;
     }
 }

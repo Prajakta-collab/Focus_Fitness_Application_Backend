@@ -75,61 +75,52 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public AttendanceResponse getAllPresentDays(Integer userId) {
-        try{
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
-            List<Attendance> allAttendance = attendanceRepository.findByUser(user) ;
+        List<Attendance> allAttendance = attendanceRepository.findByUser(user) ;
 
-            List<LocalDate> presentDays = allAttendance.stream()
-                    .map(Attendance::getPresentDate)
-                    .toList();
+        List<LocalDate> presentDays = allAttendance.stream()
+                .map(Attendance::getPresentDate)
+                .toList();
 
-            int currentStreak = 0;
-            int maxStreak = 0;
-            LocalDate lastDate = null;
+        int currentStreak = 0;
+        int maxStreak = 0;
+        LocalDate lastDate = null;
 
-            for (LocalDate date : presentDays) {
-                if (lastDate == null || lastDate.plusDays(1).isEqual(date)) {
-                    currentStreak++;
-                } else {
-                    maxStreak = Math.max(maxStreak, currentStreak);
-                    currentStreak = 1;
-                }
-                lastDate = date;
+        for (LocalDate date : presentDays) {
+            if (lastDate == null || lastDate.plusDays(1).isEqual(date)) {
+                currentStreak++;
+            } else {
+                maxStreak = Math.max(maxStreak, currentStreak);
+                currentStreak = 1;
             }
-            maxStreak = Math.max(maxStreak, currentStreak);
-
-            return AttendanceResponse.builder()
-                    .presentDays(presentDays)
-                    .maxStreak(maxStreak)
-                    .success(true)
-                    .build() ;
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
+            lastDate = date;
         }
+        maxStreak = Math.max(maxStreak, currentStreak);
+
+        return AttendanceResponse.builder()
+                .presentDays(presentDays)
+                .maxStreak(maxStreak)
+                .success(true)
+                .build() ;
     }
 
     @Override
     public List<UserDTO> getAllPresentUserByBatch(Integer batchId , String date){
 
-        try{
-            Batch batch = batchRepository.findById(batchId)
-                    .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
 
-            LocalDate searchDate = LocalDate.parse(date) ;
-            List<Attendance> attendances = attendanceRepository.findByBatchAndPresentDate(batch ,searchDate ) ;
+        LocalDate searchDate = LocalDate.parse(date) ;
+        List<Attendance> attendances = attendanceRepository.findByBatchAndPresentDate(batch ,searchDate ) ;
 
-            List<User> users = attendances.stream()
-                    .map(Attendance::getUser)
-                    .toList();
+        List<User> users = attendances.stream()
+                .map(Attendance::getUser)
+                .toList();
 
-            return users.stream()
-                    .map(user -> modelMapper.map(user , UserDTO.class))
-                    .collect(Collectors.toList());
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
+        return users.stream()
+                .map(user -> modelMapper.map(user , UserDTO.class))
+                .collect(Collectors.toList());
     }
 }
