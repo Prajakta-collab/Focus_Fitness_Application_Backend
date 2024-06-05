@@ -58,9 +58,17 @@ public class AttendanceController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AttendanceResponse> getAllPresentDays(@RequestHeader("userId") Integer userId ,
-                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        AttendanceResponse res = attendanceService.getAllPresentDays(userId) ;
+    public ResponseEntity<AttendanceResponse> getAllPresentDays(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String username = authentication.getName() ;
+
+        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+
+        //Validating user
+        utility.validateUser(token , username , authorities);
+        AttendanceResponse res = attendanceService.getAllPresentDays(loggedInUser.getId()) ;
         return ResponseEntity.ok(res) ;
     }
 

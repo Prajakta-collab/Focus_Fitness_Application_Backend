@@ -47,7 +47,7 @@ public class AuthController {
         return new ResponseEntity<>(res, HttpStatus.OK) ;
     }
 
-    @GetMapping("/by-email")
+    @PostMapping("/by-email")
     public ResponseEntity<RefreshTokenResponse> getRefreshTokenByEmail(@RequestHeader("email") String email) {
         RefreshTokenResponse refreshTokenResponse = refreshTokenService.getRefreshTokenByEmail(email);
         return new ResponseEntity<>(refreshTokenResponse, HttpStatus.OK) ;
