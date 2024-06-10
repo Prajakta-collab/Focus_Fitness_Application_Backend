@@ -1,5 +1,6 @@
 package com.project.attendance.Controller;
 
+import com.project.attendance.Model.User;
 import com.project.attendance.Utilities.Utility;
 import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
@@ -40,7 +41,7 @@ public class UserController {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String username = authentication.getName() ;
 
-        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+        User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
         utility.validateUser(token , username , authorities);
@@ -57,7 +58,7 @@ public class UserController {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String username = authentication.getName() ;
 
-        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+        User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
         utility.validateUser(token , username , authorities);
@@ -78,6 +79,12 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getAllUserByShift(@RequestParam String shift){
         List<UserDTO> userDTOS = userService.getAllUserByShift(shift) ;
         return ResponseEntity.ok(userDTOS) ;
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<User> getUserByEmail(@RequestHeader String email){
+        User user = userService.getUserByEmail(email) ;
+        return ResponseEntity.ok(user) ;
     }
 
 //

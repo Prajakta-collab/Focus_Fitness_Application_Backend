@@ -43,7 +43,7 @@ public class AttendanceController {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String username = authentication.getName() ;
 
-        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+        User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
         utility.validateUser(token , username , authorities);
@@ -64,7 +64,7 @@ public class AttendanceController {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String username = authentication.getName() ;
 
-        UserDTO loggedInUser = userService.getUserByEmail(username) ;
+        User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
         utility.validateUser(token , username , authorities);
