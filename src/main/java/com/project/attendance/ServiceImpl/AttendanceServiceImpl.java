@@ -40,9 +40,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public AttendanceDTO markAttendance(Integer userId , Integer batchId) {
 
-        try{
-
-            User user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                     .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
 
             Batch batch = batchRepository.findById(batchId)
@@ -66,10 +64,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             Attendance createdAttendance = attendanceRepository.save(attendance) ;
             return  modelMapper.map(attendance , AttendanceDTO.class);
-
-        }catch (Exception ex) {
-            throw new InternalServerException("Internal Server Error");
-        }
 
     }
 

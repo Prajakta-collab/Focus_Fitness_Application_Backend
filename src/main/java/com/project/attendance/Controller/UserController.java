@@ -44,7 +44,7 @@ public class UserController {
         User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
-        utility.validateUser(token , username , authorities);
+        utility.validateUser(token , username , authorities , loggedInUser.getId() , loggedInUser);
 
         UserDTO user = userService.getUserById(loggedInUser.getId()) ;
         return ResponseEntity.ok(user) ;
@@ -61,7 +61,7 @@ public class UserController {
         User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
-        utility.validateUser(token , username , authorities);
+        utility.validateUser(token , username , authorities , loggedInUser.getId() , loggedInUser);
 
         UserDTO updatedUser = userService.updateUser(userDTO , loggedInUser.getId()) ;
         return ResponseEntity.ok(updatedUser) ;

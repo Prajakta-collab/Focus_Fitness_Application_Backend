@@ -37,21 +37,24 @@ public class AttendanceController {
     @PostMapping("")
     public ResponseEntity<ApiResponse> markAttendance(
                                                       @RequestParam Integer batchId,
+                                                      @RequestHeader Integer userId ,
                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String username = authentication.getName() ;
+        String email = authentication.getName() ;
 
-        User loggedInUser = userService.getUserByEmail(username) ;
+        User loggedInUser = userService.getUserByEmail(email) ;
 
+        System.out.println("before");
         //Validating user
-        utility.validateUser(token , username , authorities);
+        utility.validateUser(token , email , authorities , userId , loggedInUser);
+        System.out.println("After");
 
-        AttendanceDTO attendanceDTO = attendanceService.markAttendance(loggedInUser.getId() , batchId) ;
+        AttendanceDTO attendanceDTO = attendanceService.markAttendance(userId , batchId) ;
 
         ApiResponse apiResponse = new ApiResponse() ;
-        apiResponse.setMessage("Attendance Marked Successfully for UserID :- "+ loggedInUser.getId());
+        apiResponse.setMessage("Attendance Marked Successfully for UserID :- "+ userId);
         apiResponse.setSuccess(Boolean.TRUE);
 
         return ResponseEntity.ok(apiResponse) ;
@@ -67,7 +70,7 @@ public class AttendanceController {
         User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
-        utility.validateUser(token , username , authorities);
+        utility.validateUser(token , username , authorities , loggedInUser.getId() , loggedInUser);
         AttendanceResponse res = attendanceService.getAllPresentDays(loggedInUser.getId()) ;
         return ResponseEntity.ok(res) ;
     }

@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Objects;
 
 
 @Configuration
@@ -20,7 +21,7 @@ public class Utility {
     @Autowired
     UserRepository userRepository ;
 
-    public void validateUser(String token , String email , Collection<? extends GrantedAuthority> authorities) {
+    public void validateUser(String token , String email , Collection<? extends GrantedAuthority> authorities , Integer userId , User loggedInUser) {
 
         String actualToken = token.substring(7); // Remove "Bearer " prefix
         String username = Jwts.parser().setSigningKey(String.valueOf(AppConstants.JWT_SECRET)).parseClaimsJws(actualToken).getBody().getSubject();
@@ -28,9 +29,14 @@ public class Utility {
 
         /* Admin can access anything so returning same id to show same person is accessing */
         for (GrantedAuthority authority : authorities) {
-            if (authority.getAuthority().equals("ROLE_ADMIN")) {
+            if (authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_STAFF")) {
                 return;
             }
+        }
+
+        if(!Objects.equals(userId, loggedInUser.getId())){
+            System.out.println("Check :- userId" + userId + " --  loggedInUser" + loggedInUser.getId() );
+            throw new AccessDeniedException("Unauthorized access to data") ;
         }
 
         if(!username.equals(email)){
