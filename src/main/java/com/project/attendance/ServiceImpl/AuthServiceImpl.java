@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl {
@@ -43,9 +44,20 @@ public class AuthServiceImpl {
 
 
     public JwtAuthResponse login(JwtAuthRequest request){
-        this.doAuthenticate(request.getUsername(), request.getPassword());
 
+        this.doAuthenticate(request.getUsername(), request.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+
+        //UserType check
+        String loggedInUserType = getAuthoritiesString(userDetails.getAuthorities());
+//        System.out.println("Logged in user type: " + loggedInUserType );
+//        System.out.println("Provided user type: " + request.getUsertype() );
+
+        if(!loggedInUserType.equals(request.getUsertype())){
+            throw new BadCredentialsException("You are not "+ request.getUsertype()+ " Please provide details accordingly") ;
+        }
+
+
         String token = this.helper.generateToken(userDetails);
 
         /* Refresh Token - If user is log in successfully  */
@@ -95,5 +107,11 @@ public class AuthServiceImpl {
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException(" Invalid Username or Password  !!");
         }
+    }
+
+    public static String getAuthoritiesString(Collection<? extends GrantedAuthority> authorities) {
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
     }
 }
