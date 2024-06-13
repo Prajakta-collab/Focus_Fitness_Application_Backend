@@ -6,7 +6,7 @@ import com.project.attendance.Payload.DTO.UserDTO;
 import java.util.List;
 
 public interface UserService {
-    public UserDTO createUser(UserDTO userDTO) ;
+    public UserDTO createUser(UserDTO userDTO , String otp) ;
     public List<UserDTO> getAllUser() ;
     public User getUserByEmail(String email) ;
     public User getUserById(Integer userId) ;

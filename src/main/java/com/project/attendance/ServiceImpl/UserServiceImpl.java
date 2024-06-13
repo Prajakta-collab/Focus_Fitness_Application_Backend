@@ -11,6 +11,7 @@ import com.project.attendance.Repository.BatchRepository;
 import com.project.attendance.Repository.RoleRepository;
 import com.project.attendance.Repository.UserRepository;
 import com.project.attendance.Service.UserService;
+import com.project.attendance.Utilities.Utility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,8 +40,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     PasswordEncoder passwordEncoder ;
 
+    @Autowired
+    Utility utility ;
+
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserDTO userDTO , String otp) {
+
+        //verify otp
+        utility.verifyOtp(userDTO.getEmail() , otp) ;
 
         User user = modelMapper.map(userDTO , User.class) ;
 

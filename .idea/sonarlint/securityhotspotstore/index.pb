@@ -135,3 +135,15 @@ w
 G.idea/sonarlint/issuestore/e/9/e9807d4972dcbd2b49bcdae8a95ff9c00ea783bb,2\e\2e32068abf173aa78b1cc3ebf8ec447204c6bbca
 w
 G.idea/sonarlint/issuestore/8/5/856eea4fced1b33da2e4b5d88f54189e037a432e,1\b\1b0cb7586c400a85c2b706b57b6c109f67599892
+r
+Bsrc/main/java/com/project/attendance/ServiceImpl/EmailService.java,6\9\69cf0557d6559d5d4e11091fe61d8cc4dce9a832
+t
+Dsrc/main/java/com/project/attendance/Controller/EmailController.java,8\0\8040f53c9b0ca4851783d37bd8be991e7510fde7
+w
+Gsrc/main/java/com/project/attendance/Payload/Requests/EmailRequest.java,1\d\1dca25729687a00aa14724aeb8db2a8ee8144171
+c
+3src/main/java/com/project/attendance/Model/OTP.java,4\4\449715de633557af8a5a16adb3e789437db64d1a
+r
+Bsrc/main/java/com/project/attendance/Repository/OTPRepository.java,5\a\5a6f8dcf2a331df0d2234377881344b5e8c76f84
+€
+Psrc/main/java/com/project/attendance/Payload/Requests/ForgetPasswordPayload.java,b\7\b7fd94085d56409a566ee333ab66597534c49fca

@@ -2,12 +2,16 @@ package com.project.attendance.ServiceImpl;
 
 import com.project.attendance.Exception.InternalServerException;
 import com.project.attendance.Exception.ResourceNotFoundException;
+import com.project.attendance.Model.OTP;
 import com.project.attendance.Model.RefreshToken;
 import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
+import com.project.attendance.Payload.Requests.EmailRequest;
 import com.project.attendance.Payload.Requests.JwtAuthRequest;
 import com.project.attendance.Payload.Response.JwtAuthResponse;
 import com.project.attendance.Payload.Requests.RefreshTokenRequestDTO;
+import com.project.attendance.Repository.OTPRepository;
+import com.project.attendance.Utilities.Utility;
 import com.project.attendance.security.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,6 +47,14 @@ public class AuthServiceImpl {
     @Autowired
     private JwtTokenHelper helper ;
 
+    @Autowired
+    EmailService emailService ;
+
+    @Autowired
+    Utility utility ;
+
+    @Autowired
+    OTPRepository otpRepository ;
 
     public JwtAuthResponse login(JwtAuthRequest request){
 
@@ -114,4 +127,53 @@ public class AuthServiceImpl {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
     }
+
+
+    public OTP sendForgetPasswordOTPByEmail(String email){
+
+        String otp = utility.generateOTP();
+
+        //save otp in DB
+        OTP generatedOTP = OTP.builder()
+                .otp(otp)
+                .email(email)
+                .creationTime(LocalDateTime.now())
+                .build();
+
+        OTP savedOTP = otpRepository.save(generatedOTP) ;
+
+        EmailRequest emailRequest = EmailRequest.builder()
+                .recipient(email)
+                .subject("Password Reset Code - FOCUS FITNESS")
+                .body("Your password reset code is " + otp)
+                .build() ;
+
+        emailService.sendEmail(emailRequest);
+        return savedOTP ;
+    }
+
+    public OTP getVerificationOTPByEmail(String email){
+
+        String otp = utility.generateOTP();
+
+        //save otp in DB
+        OTP generatedOTP = OTP.builder()
+                .otp(otp)
+                .email(email)
+                .creationTime(LocalDateTime.now())
+                .build() ;
+
+        OTP savedOTP = otpRepository.save(generatedOTP) ;
+
+        EmailRequest emailRequest = EmailRequest.builder()
+                .recipient(email)
+                .subject("Email Verification Code - FOCUS FITNESS")
+                .body("Your email verification code is " + otp)
+                .build() ;
+
+        emailService.sendEmail(emailRequest);
+        return savedOTP ;
+    }
+
+
 }
