@@ -5,6 +5,7 @@ import com.project.attendance.Exception.InternalServerException;
 import com.project.attendance.Model.Role;
 import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
+import com.project.attendance.Payload.Response.ApiResponse;
 import com.project.attendance.Repository.RoleRepository;
 import com.project.attendance.Repository.UserRepository;
 import com.project.attendance.Service.StaffService;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class StaffServiceImpl implements StaffService {
@@ -55,5 +57,53 @@ public class StaffServiceImpl implements StaffService {
         return modelMapper.map(createdUser , UserDTO.class) ;
     }
 
-//    public void personalTrainingEnrollment(Integer staffID , Integer userID)
+    @Override
+    public ApiResponse assignTraineeToTrainer(User trainer, User trainee) {
+        if (trainer.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF")) &&
+                trainee.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_USER"))) {
+
+            System.out.println("in service F if");
+            if(trainer.getTrainees().contains(trainee)){
+                System.out.println("in service S if");
+                return ApiResponse.builder()
+                        .message("Trainee is already getting PT")
+                        .success(Boolean.FALSE)
+                        .className(this.getClass().toString())
+                        .build() ;
+            }
+
+            trainer.getTrainees().add(trainee);
+
+            if(trainee.getTrainers().contains(trainer)){
+                return ApiResponse.builder()
+                        .message("Trainee is already getting PT from This trainer")
+                        .success(Boolean.FALSE)
+                        .className(this.getClass().toString())
+                        .build() ;
+            }
+
+            trainee.getTrainers().add(trainer);
+
+            userRepository.save(trainer);
+            userRepository.save(trainee);
+
+            return ApiResponse.builder()
+                    .message("PT Assigned Successfully")
+                    .success(Boolean.TRUE)
+                    .className(this.getClass().toString())
+                    .build() ;
+        } else {
+            throw new IllegalArgumentException("Trainer must have ROLE_STAFF and trainee must have ROLE_USER");
+        }
+    }
+
+    @Override
+    public List<User> getTrainees(User trainer) {
+        return trainer.getTrainees();
+    }
+
+    @Override
+    public List<User> getTrainers(User trainee) {
+        return trainee.getTrainers();
+    }
 }

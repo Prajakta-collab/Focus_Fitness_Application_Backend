@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserDTO> getUserById(
+    public ResponseEntity<User> getUserById(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -46,7 +46,7 @@ public class UserController {
         //Validating user
         utility.validateUser(token , username , authorities , loggedInUser.getId() , loggedInUser);
 
-        UserDTO user = userService.getUserById(loggedInUser.getId()) ;
+        User user = userService.getUserById(loggedInUser.getId()) ;
         return ResponseEntity.ok(user) ;
     }
 

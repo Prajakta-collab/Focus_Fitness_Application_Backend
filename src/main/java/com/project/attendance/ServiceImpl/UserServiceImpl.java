@@ -95,11 +95,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
+    public User getUserById(Integer userId) {
 
-        return modelMapper.map(user , UserDTO.class) ;
+        return userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User" , "userId" , userId));
     }
 
     @Override
@@ -170,4 +169,6 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user) ;
         return modelMapper.map(updatedUser , UserDTO.class) ;
     }
+
+
 }

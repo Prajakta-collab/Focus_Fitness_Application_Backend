@@ -77,6 +77,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body(apiResponse) ;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse> IllegalArgumentExceptionHandler(IllegalArgumentException e){
+        String message = e.getMessage() ;
+        ApiResponse apiResponse = new ApiResponse(message , Boolean.FALSE , getClassName(e)) ;
+        return ResponseEntity.status(400).body(apiResponse) ;
+    }
+
     private String getClassName(Exception e) {
         StackTraceElement[] stackTrace = e.getStackTrace();
         if (stackTrace.length > 0) {
