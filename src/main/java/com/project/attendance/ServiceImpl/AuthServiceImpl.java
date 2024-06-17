@@ -8,11 +8,14 @@ import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.Payload.Requests.EmailRequest;
 import com.project.attendance.Payload.Requests.JwtAuthRequest;
+import com.project.attendance.Payload.Response.ApiResponse;
 import com.project.attendance.Payload.Response.JwtAuthResponse;
 import com.project.attendance.Payload.Requests.RefreshTokenRequestDTO;
+import com.project.attendance.Payload.Response.RefreshTokenResponse;
 import com.project.attendance.Repository.OTPRepository;
 import com.project.attendance.Utilities.Utility;
 import com.project.attendance.security.JwtTokenHelper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.springframework.security.core.context.SecurityContextHolder.*;
 
 @Service
 public class AuthServiceImpl {
@@ -61,11 +66,7 @@ public class AuthServiceImpl {
         this.doAuthenticate(request.getUsername(), request.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
 
-        //UserType check
         String loggedInUserType = getAuthoritiesString(userDetails.getAuthorities());
-//        System.out.println("Logged in user type: " + loggedInUserType );
-//        System.out.println("Provided user type: " + request.getUsertype() );
-
         if(!loggedInUserType.equals(request.getUsertype())){
             throw new BadCredentialsException("You are not "+ request.getUsertype()+ " Please provide details accordingly") ;
         }
@@ -83,6 +84,23 @@ public class AuthServiceImpl {
 
         return response;
     }
+
+
+    @Transactional
+    public ApiResponse logout(Integer userId) {
+        // Clear SecurityContext
+        SecurityContextHolder.clearContext();
+
+        // Remove refresh token associated with the user
+        refreshTokenService.removeRefreshToken(userId);
+
+        return ApiResponse.builder()
+                .message("Logout successful")
+                .success(Boolean.TRUE)
+                .className(this.getClass().getSimpleName())
+                .build();
+    }
+
 
     public JwtAuthResponse createAccessToken(RefreshTokenRequestDTO refreshTokenRequestDTO){
 

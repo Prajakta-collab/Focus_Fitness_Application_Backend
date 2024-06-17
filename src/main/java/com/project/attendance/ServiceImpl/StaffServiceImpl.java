@@ -21,24 +21,24 @@ import java.util.List;
 public class StaffServiceImpl implements StaffService {
 
     @Autowired
-    UserRepository userRepository ;
+    UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder ;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
-    RoleRepository roleRepository ;
+    RoleRepository roleRepository;
 
     @Autowired
-    ModelMapper modelMapper ;
+    ModelMapper modelMapper;
 
     @Autowired
-    UserServiceImpl userService ;
+    UserServiceImpl userService;
 
     @Override
     public UserDTO createStaff(UserDTO userDTO) {
 
-        User user = modelMapper.map(userDTO , User.class) ;
+        User user = modelMapper.map(userDTO, User.class);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setJoining_LocalDate(LocalDate.now());
@@ -48,13 +48,13 @@ public class StaffServiceImpl implements StaffService {
         Role role = roleRepository.findById(AppConstants.STAFF_USER).get();
         user.getRoles().add(role);
 
-        User createdUser = userRepository.save(user) ;
+        User createdUser = userRepository.save(user);
 
         /* Set shift */
-        Integer batchId = user.getShift() == "Morning" ? 1 : 2 ;
-        userService.enrolledToBatch(createdUser.getId() , batchId) ;
+        Integer batchId = user.getShift() == "Morning" ? 1 : 2;
+        userService.enrolledToBatch(createdUser.getId(), batchId);
 
-        return modelMapper.map(createdUser , UserDTO.class) ;
+        return modelMapper.map(createdUser, UserDTO.class);
     }
 
     @Override
@@ -62,36 +62,28 @@ public class StaffServiceImpl implements StaffService {
         if (trainer.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF")) &&
                 trainee.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_USER"))) {
 
-            System.out.println("in service F if");
-            if(trainer.getTrainees().contains(trainee)){
-                System.out.println("in service S if");
-                return ApiResponse.builder()
-                        .message("Trainee is already getting PT")
-                        .success(Boolean.FALSE)
-                        .className(this.getClass().toString())
-                        .build() ;
+            // Ensure the trainee is not already assigned to another trainer
+            if (trainee.getTrainer() != null && !trainee.getTrainer().equals(trainer)) {
+                throw new IllegalArgumentException("Trainee is already assigned to another trainer");
             }
 
-            trainer.getTrainees().add(trainee);
-
-            if(trainee.getTrainers().contains(trainer)){
-                return ApiResponse.builder()
-                        .message("Trainee is already getting PT from This trainer")
-                        .success(Boolean.FALSE)
-                        .className(this.getClass().toString())
-                        .build() ;
+            // Check if the trainer already has the trainee in their list
+            if (!trainer.getTrainees().contains(trainee)) {
+                // Add the trainee to the trainer's list of trainees
+                trainer.getTrainees().add(trainee);
+                // Set the trainer for the trainee
+                trainee.setTrainer(trainer);
+                userRepository.save(trainer);
+                userRepository.save(trainee);
+            } else {
+                throw new IllegalArgumentException("Trainee is already assigned to this trainer");
             }
-
-            trainee.getTrainers().add(trainer);
-
-            userRepository.save(trainer);
-            userRepository.save(trainee);
 
             return ApiResponse.builder()
                     .message("PT Assigned Successfully")
                     .success(Boolean.TRUE)
                     .className(this.getClass().toString())
-                    .build() ;
+                    .build();
         } else {
             throw new IllegalArgumentException("Trainer must have ROLE_STAFF and trainee must have ROLE_USER");
         }
@@ -102,8 +94,4 @@ public class StaffServiceImpl implements StaffService {
         return trainer.getTrainees();
     }
 
-    @Override
-    public List<User> getTrainers(User trainee) {
-        return trainee.getTrainers();
-    }
 }

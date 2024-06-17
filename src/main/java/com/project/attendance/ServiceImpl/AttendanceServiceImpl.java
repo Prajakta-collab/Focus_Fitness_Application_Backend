@@ -101,7 +101,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<UserDTO> getAllPresentUserByBatch(Integer batchId , String date){
+    public List<User> getAllPresentUserByBatch(Integer batchId , String date){
 
         Batch batch = batchRepository.findById(batchId)
                 .orElseThrow(()-> new ResourceNotFoundException("Batch" , "batchId" , batchId));
@@ -113,8 +113,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .map(Attendance::getUser)
                 .toList();
 
-        return users.stream()
-                .map(user -> modelMapper.map(user , UserDTO.class))
-                .collect(Collectors.toList());
+        return users ;
     }
 }

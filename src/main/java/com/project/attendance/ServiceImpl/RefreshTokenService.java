@@ -38,12 +38,29 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+
+    public RefreshTokenResponse getRefreshTokenById(Integer userId) {
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId);
+
+        if(refreshToken != null){
+            return RefreshTokenResponse.builder()
+                    .refreshToken(refreshToken)
+                    .success(Boolean.TRUE)
+                    .build() ;
+        }else{
+            return RefreshTokenResponse.builder()
+                    .refreshToken(null)
+                    .success(Boolean.FALSE)
+                    .build() ;
+        }
+    }
+
     public RefreshTokenResponse getRefreshTokenByEmail(String email) {
         RefreshToken refreshToken = refreshTokenRepository.findByUserEmail(email);
 
         if(refreshToken != null){
             return RefreshTokenResponse.builder()
-                    .refreshToken(refreshToken.getToken())
+                    .refreshToken(refreshToken)
                             .success(Boolean.TRUE)
                                     .build() ;
         }else{
@@ -67,6 +84,10 @@ public class RefreshTokenService {
             refreshTokenRepository.delete(token);
             throw new ResourceExpireException(token.getToken() + " Refresh token is expired. Please make a new login..!");
         }
+    }
+
+    public void removeRefreshToken(Integer userId){
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
 }

@@ -14,4 +14,5 @@ public interface UserService {
     public void deleteUser(Integer userId) ;
     public List<UserDTO> getAllUserByShift(String shift) ;
     public UserDTO enrolledToBatch(Integer userId ,Integer batchId) ;
+    User getTrainers(User trainee);
 }

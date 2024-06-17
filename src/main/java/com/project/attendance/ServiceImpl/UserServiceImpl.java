@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getAllUser() {
 
         try{
-            List<User> users = userRepository.findAll() ;
+            List<User> users = userRepository.findNormalUsers() ;
 
             List<UserDTO> userDTOs = users.stream()
                     .map(user -> modelMapper.map(user , UserDTO.class))
@@ -178,4 +178,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public User getTrainers(User trainee) {
+        return trainee.getTrainer();
+    }
 }

@@ -35,7 +35,8 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<User> getUserById(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token ,
+            @RequestHeader Integer userId){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -44,9 +45,9 @@ public class UserController {
         User loggedInUser = userService.getUserByEmail(username) ;
 
         //Validating user
-        utility.validateUser(token , username , authorities , loggedInUser.getId() , loggedInUser);
+        utility.validateUser(token , username , authorities , userId , loggedInUser);
 
-        User user = userService.getUserById(loggedInUser.getId()) ;
+        User user = userService.getUserById(userId) ;
         return ResponseEntity.ok(user) ;
     }
 
@@ -87,15 +88,17 @@ public class UserController {
         return ResponseEntity.ok(user) ;
     }
 
-//
-//    @PostMapping("/enroll/user/{userId}/batch/{batchId}")
-//    @PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_STAFF')")
-//    public ResponseEntity<UserDTO> enrollToBatch(@PathVariable Integer userId ,
-//                                                 @PathVariable Integer batchId){
-//
-//        UserDTO updatedUser = userService.enrolledToBatch(userId , batchId) ;
-//        return ResponseEntity.ok(updatedUser) ;
-//    }
+    @GetMapping("/trainer")
+    public User getTrainers(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String username = authentication.getName() ;
+
+        User loggedInUser = userService.getUserByEmail(username) ;
+
+        User trainee = userService.getUserById(loggedInUser.getId());
+        return userService.getTrainers(trainee);
+    }
 }
 
 

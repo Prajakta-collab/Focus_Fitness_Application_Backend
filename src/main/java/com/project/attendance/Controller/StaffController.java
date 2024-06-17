@@ -82,9 +82,4 @@ public class StaffController {
         return staffService.getTrainees(trainer);
     }
 
-    @GetMapping("/trainers")
-    public List<User> getTrainers(@PathVariable Integer traineeId) {
-        User trainee = userService.getUserById(traineeId);
-        return staffService.getTrainers(trainee);
-    }
 }

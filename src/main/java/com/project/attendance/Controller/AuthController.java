@@ -18,11 +18,17 @@ import com.project.attendance.ServiceImpl.RefreshTokenService;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import com.project.attendance.Utilities.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -62,6 +68,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
         JwtAuthResponse res = authService.login(request) ;
+        return new ResponseEntity<>(res, HttpStatus.OK) ;
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String username = authentication.getName() ;
+
+        User loggedInUser = userService.getUserByEmail(username) ;
+
+        ApiResponse res = authService.logout(loggedInUser.getId()) ;
         return new ResponseEntity<>(res, HttpStatus.OK) ;
     }
 

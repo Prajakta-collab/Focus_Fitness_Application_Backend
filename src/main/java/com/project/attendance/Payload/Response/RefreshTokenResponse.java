@@ -1,5 +1,6 @@
 package com.project.attendance.Payload.Response;
 
+import com.project.attendance.Model.RefreshToken;
 import lombok.*;
 
 @Getter
@@ -8,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RefreshTokenResponse {
-    private String refreshToken ;
+    private RefreshToken refreshToken ;
     private Boolean success ;
 }

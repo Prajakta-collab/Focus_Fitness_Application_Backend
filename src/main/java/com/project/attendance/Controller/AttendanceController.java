@@ -77,9 +77,9 @@ public class AttendanceController {
 
     @GetMapping("/batch")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<UserDTO>> getAllPresentUserByBatch(@RequestParam Integer batchId ,
+    public ResponseEntity<List<User>> getAllPresentUserByBatch(@RequestParam Integer batchId ,
                                                                   @RequestParam String date){
-        List<UserDTO> users = attendanceService.getAllPresentUserByBatch(batchId , date) ;
+        List<User> users = attendanceService.getAllPresentUserByBatch(batchId , date) ;
         return ResponseEntity.ok(users) ;
     }
 }
