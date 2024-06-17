@@ -1,11 +1,13 @@
 package com.project.attendance.ServiceImpl;
 
 import com.project.attendance.Config.AppConstants;
-import com.project.attendance.Exception.InternalServerException;
+import com.project.attendance.Model.PTSession;
 import com.project.attendance.Model.Role;
 import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
 import com.project.attendance.Payload.Response.ApiResponse;
+import com.project.attendance.Payload.Response.PTSessionResponse;
+import com.project.attendance.Repository.PTSessionRepository;
 import com.project.attendance.Repository.RoleRepository;
 import com.project.attendance.Repository.UserRepository;
 import com.project.attendance.Service.StaffService;
@@ -15,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StaffServiceImpl implements StaffService {
@@ -34,6 +38,12 @@ public class StaffServiceImpl implements StaffService {
 
     @Autowired
     UserServiceImpl userService;
+
+    @Autowired
+    PTSessionService ptSessionService ;
+
+    @Autowired
+    PTSessionRepository ptSessionRepository ;
 
     @Override
     public UserDTO createStaff(UserDTO userDTO) {
@@ -94,4 +104,60 @@ public class StaffServiceImpl implements StaffService {
         return trainer.getTrainees();
     }
 
+    @Override
+    public ApiResponse addPTSession(Integer trainerId, Integer traineeId, String exercise, String timeIn, String timeOut, String date) {
+        LocalTime timeInParsed = LocalTime.parse(timeIn);
+        LocalTime timeOutParsed = LocalTime.parse(timeOut);
+        LocalDate dateParsed = LocalDate.parse(date);
+
+        PTSession ptSession = ptSessionService.addPTSession(trainerId, traineeId, exercise, timeInParsed, timeOutParsed, dateParsed);
+        return ApiResponse.builder()
+                .message("PT Session added successfully")
+                .success(Boolean.TRUE)
+                .className(this.getClass().toString())
+                .build();
+    }
+
+
+    @Override
+    public List<PTSessionResponse> getPTSessions(Integer trainerId) {
+        User trainer = userRepository.findById(trainerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid trainer ID"));
+
+        List<PTSession> ptSessions = ptSessionRepository.findPTSessionsByTrainer(trainer);
+
+        return ptSessions.stream().map(session -> {
+            PTSessionResponse response = new PTSessionResponse();
+            response.setSessionId(session.getId());
+            response.setTrainerId(session.getTrainer().getId());
+            response.setTraineeId(session.getTrainee().getId());
+            response.setExercise(session.getExercise());
+            response.setTimeIn(session.getTimeIn());
+            response.setTimeOut(session.getTimeOut());
+            response.setDate(session.getDate());
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PTSessionResponse> getPTSessionsForTrainee(Integer traineeId) {
+        User trainee = userRepository.findById(traineeId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid trainee ID"));
+
+        List<PTSession> ptSessions = ptSessionRepository.findByTrainee(trainee);
+
+        return ptSessions.stream().map(this::convertToResponse).collect(Collectors.toList());
+    }
+
+    private PTSessionResponse convertToResponse(PTSession session) {
+        PTSessionResponse response = new PTSessionResponse();
+        response.setSessionId(session.getId());
+        response.setTrainerId(session.getTrainer().getId());
+        response.setTraineeId(session.getTrainee().getId());
+        response.setExercise(session.getExercise());
+        response.setTimeIn(session.getTimeIn());
+        response.setTimeOut(session.getTimeOut());
+        response.setDate(session.getDate());
+        return response;
+    }
 }

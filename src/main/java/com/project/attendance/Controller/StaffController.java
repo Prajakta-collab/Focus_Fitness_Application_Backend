@@ -2,7 +2,9 @@ package com.project.attendance.Controller;
 
 import com.project.attendance.Model.User;
 import com.project.attendance.Payload.DTO.UserDTO;
+import com.project.attendance.Payload.Requests.PTSessionRequest;
 import com.project.attendance.Payload.Response.ApiResponse;
+import com.project.attendance.Payload.Response.PTSessionResponse;
 import com.project.attendance.ServiceImpl.StaffServiceImpl;
 import com.project.attendance.ServiceImpl.UserServiceImpl;
 import com.project.attendance.Utilities.Utility;
@@ -82,4 +84,22 @@ public class StaffController {
         return staffService.getTrainees(trainer);
     }
 
+    @PreAuthorize("hasRole('ROLE_STAFF')")
+    @PostMapping("/pt-session")
+    public ApiResponse addPTSession(@RequestBody PTSessionRequest ptSessionRequest) {
+        return staffService.addPTSession(ptSessionRequest.getTrainerId(), ptSessionRequest.getTraineeId(),
+                ptSessionRequest.getExercise(), ptSessionRequest.getTimeIn(),
+                ptSessionRequest.getTimeOut(), ptSessionRequest.getDate());
+    }
+
+    @PreAuthorize("hasRole('ROLE_STAFF')")
+    @GetMapping("/pt-sessions")
+    public List<PTSessionResponse> getPTSessions(@RequestHeader Integer trainerId) {
+        return staffService.getPTSessions(trainerId);
+    }
+
+    @GetMapping("/pt-sessions/get-details")
+    public List<PTSessionResponse> getPTSessionsForTrainee(@RequestHeader Integer traineeId) {
+        return staffService.getPTSessionsForTrainee(traineeId);
+    }
 }
